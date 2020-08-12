@@ -18,9 +18,9 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+from io import BytesIO
 
 from PIL import Image, ImageOps
-from io import BytesIO
 
 from .PictureDimensions import PictureDimensions
 from .. import StateMachine
@@ -68,7 +68,9 @@ class Camera:
         if self._rotation is not None:
             test_picture = test_picture.transpose(self._rotation)
 
-        self._pic_dims = PictureDimensions(self._cfg, test_picture.size)
+        image = Image.open(test_picture)
+
+        self._pic_dims = PictureDimensions(self._cfg, image.size)
         self._is_preview = self._is_preview and self._cap.hasPreview
 
         background = self._cfg.get('Picture', 'background')
@@ -141,17 +143,17 @@ class Camera:
     def capturePicture(self, state):
 
         self.setIdle()
-        picture = self._cap.getPicture()
-        if self._rotation is not None:
-            picture = picture.transpose(self._rotation)
-        byte_data = BytesIO()
-        picture.save(byte_data, format='jpeg')
-        self._pictures.append(byte_data)
+        picture_bytes = self._cap.getPicture()
+        # if self._rotation is not None: # TODO think about an solution for this
+        #     picture = picture.transpose(self._rotation)
+        # byte_data = BytesIO()
+        # picture.save(byte_data, format='jpeg')
+        self._pictures.append(picture_bytes)
         self.setActive()
 
         if self._is_keep_pictures:
             self._comm.send(Workers.WORKER,
-                            StateMachine.CameraEvent('capture', byte_data))
+                            StateMachine.CameraEvent('capture', picture_bytes))
 
         if state.num_picture < self._pic_dims.totalNumPictures:
             self._comm.send(Workers.MASTER,

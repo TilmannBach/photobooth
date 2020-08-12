@@ -141,4 +141,4 @@ class CameraGphoto2(CameraInterface):
         camera_file = self._cap.file_get(file_path.folder, file_path.name,
                                          gp.GP_FILE_TYPE_NORMAL)
         file_data = camera_file.get_data_and_size()
-        return Image.open(io.BytesIO(file_data))
+        return io.BytesIO(file_data)
