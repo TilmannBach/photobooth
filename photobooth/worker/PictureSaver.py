@@ -38,7 +38,4 @@ class PictureSaver(WorkerTask):
 
         logging.info('Saving picture as %s', filename)
         with open(filename, 'wb') as f:
-            import io
-            from PIL import Image
-            image = Image.open(io.BytesIO(picture.getbuffer()))
             f.write(picture.getbuffer())
