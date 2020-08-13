@@ -134,7 +134,7 @@ class Camera:
                 if self._rotation is not None:
                     picture = picture.transpose(self._rotation)
                 picture = picture.resize(self._pic_dims.previewSize)
-                picture = ImageOps.mirror(picture)
+                # picture = ImageOps.mirror(picture)
                 byte_data = BytesIO()
                 picture.save(byte_data, format='jpeg')
                 self._comm.send(Workers.GUI,
